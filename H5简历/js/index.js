@@ -30,6 +30,7 @@ var loadingRender = (function() {
 						if(page === 0)return;
 						window.setTimeout(function() {
 							$loading.css("display", "none");
+							phoneRender.init();
 						}, 2000)
 					}
 				}
@@ -37,15 +38,37 @@ var loadingRender = (function() {
 		}
 	}
 })();
-
+/*phone显示 单例模式*/
 var phoneRender = (function(){
-	var $phone = $("#phone");
+	var $phone = $("#phone"),
+		$listen = $phone.children(".listen"),
+		$listenTouch = $listen.children(".touch"),
+		$detail = $phone.children(".details"),
+		$detailTouch = $detail.children(".touch"),
+		$time = $phone.children(".time");
+	
+	var listenMusic = $("#listenMusic")[0],
+		detailMusic = $("#detailsMusic")[0],
+		musicTimer = null;
+	
 	return{
 		init:function(){
 			$phone.css("display","block");
+			listenMusic.play();
+			//给listenTouch绑定接听事件
+			//在移动端事件中，click会有300ms的延迟
+			//可以用移动端的专门事件的原生事件 touchstart touchmove touchend 来进行模拟，zepto中封装一个方法singleTap(单击)
+			$listenTouch.singleTap(function(){
+				$listen.css("display","none");
+				listenMusic.pause();
+				$detail.css("transform","translateY(0)");
+				$time.css("display","block");
+				detailMusic.play();
+			});
 		}
 	}
 })();
+
 /*控制page显示*/
 var urlObj = window.location.href.queryURLParameter();
 var page = parseFloat(urlObj["page"]);
